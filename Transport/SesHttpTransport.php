@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Amazon\Http;
+namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\Transport\Http\AbstractHttpTransport;
+use Symfony\Component\Mailer\Transport\AbstractHttpTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class SesTransport extends AbstractHttpTransport
+class SesHttpTransport extends AbstractHttpTransport
 {
     private const ENDPOINT = 'https://email.%region%.amazonaws.com';
 

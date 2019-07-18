@@ -9,10 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Amazon\Tests\Factory;
+namespace Symfony\Component\Mailer\Bridge\Amazon\Tests\Transport;
 
-use Symfony\Component\Mailer\Bridge\Amazon;
-use Symfony\Component\Mailer\Bridge\Amazon\Factory\SesTransportFactory;
+use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiTransport;
+use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesHttpTransport;
+use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesSmtpTransport;
+use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Tests\TransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
@@ -55,32 +57,32 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
 
         yield [
             new Dsn('api', 'ses', self::USER, self::PASSWORD),
-            new Amazon\Http\Api\SesTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new SesApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('api', 'ses', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
-            new Amazon\Http\Api\SesTransport(self::USER, self::PASSWORD, 'eu-west-1', $client, $dispatcher, $logger),
+            new SesApiTransport(self::USER, self::PASSWORD, 'eu-west-1', $client, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('http', 'ses', self::USER, self::PASSWORD),
-            new Amazon\Http\SesTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+            new SesHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('http', 'ses', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
-            new Amazon\Http\SesTransport(self::USER, self::PASSWORD, 'eu-west-1', $client, $dispatcher, $logger),
+            new SesHttpTransport(self::USER, self::PASSWORD, 'eu-west-1', $client, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('smtp', 'ses', self::USER, self::PASSWORD),
-            new Amazon\Smtp\SesTransport(self::USER, self::PASSWORD, null, $dispatcher, $logger),
+            new SesSmtpTransport(self::USER, self::PASSWORD, null, $dispatcher, $logger),
         ];
 
         yield [
             new Dsn('smtp', 'ses', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
-            new Amazon\Smtp\SesTransport(self::USER, self::PASSWORD, 'eu-west-1', $dispatcher, $logger),
+            new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', $dispatcher, $logger),
         ];
     }
 
