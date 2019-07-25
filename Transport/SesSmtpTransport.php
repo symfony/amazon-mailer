@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Amazon\Smtp;
+namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
@@ -18,7 +18,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Kevin Verschaeve
  */
-class SesTransport extends EsmtpTransport
+class SesSmtpTransport extends EsmtpTransport
 {
     /**
      * @param string $region Amazon SES region (currently one of us-east-1, us-west-2, or eu-west-1)
