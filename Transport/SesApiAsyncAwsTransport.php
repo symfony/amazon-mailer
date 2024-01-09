@@ -102,6 +102,33 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
         }
 
+        if ($email->getHeaders()->has('X-SES-LIST-MANAGEMENT-OPTIONS') || $email->getHeaders()->has('X-SES-CONTACT-LIST-NAME')) {
+            $input = [
+                'ContactListName' => null,
+            ];
+            
+            if ($email->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+                $options = $email->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')->getBodyAsString();
+                $options = explode('; topic=', $options);
+    
+                $input['ContactListName'] = $options[0];
+    
+                if (count($options) > 1) {
+                    $input['TopicName'] = $options[1];
+                }
+            } else {
+                $input['ContactListName'] = $email->getHeaders()->get('X-SES-CONTACT-LIST-NAME')->getBodyAsString();
+                
+                if ($header = $email->getHeaders()->get('X-SES-TOPIC-NAME')) {
+                    $input['TopicName'] = $header->getBodyAsString();
+                }
+            }
+            
+            if ($input['ContactListName']) {
+                $request['ListManagementOptions'] = new ListManagementOptions($input);
+            }
+        }
+
         foreach ($email->getHeaders()->all() as $header) {
             if ($header instanceof MetadataHeader) {
                 $request['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
