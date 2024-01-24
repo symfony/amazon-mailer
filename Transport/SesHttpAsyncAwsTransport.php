@@ -88,6 +88,12 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             && $sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
             $request['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
         }
+        if (($message->getOriginalMessage() instanceof Message)
+            && $header = $message->getOriginalMessage()->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+            if(preg_match("/^(contactListName=)*(?<ContactListName>[^;]+);\s?topicName=(?<TopicName>.+)$/ix", $header->getBodyAsString(), $listManagementOptions)) {
+                $request['ListManagementOptions'] = array_filter($listManagementOptions, fn($e) => in_array($e, ['ContactListName', 'TopicName']), ARRAY_FILTER_USE_KEY);
+            }
+        }
         if ($message->getOriginalMessage() instanceof Message) {
             foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
                 if ($header instanceof MetadataHeader) {
