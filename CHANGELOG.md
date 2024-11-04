@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.2
+---
+
+* Add support for custom headers in ses+api
+
 7.1
 ---
 
