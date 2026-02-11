@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Tests\Transport;
 use AsyncAws\Core\Configuration;
 use AsyncAws\Core\Credentials\NullProvider;
 use AsyncAws\Ses\SesClient;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -124,9 +125,45 @@ class SesApiAsyncAwsTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
+    public function testSendWithNonAsciiCustomHeaders()
+    {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
+            $content = json_decode($options['body'], true);
+
+            $headers = [];
+            foreach ($content['Content']['Simple']['Headers'] as $header) {
+                $headers[$header['Name']] = $header['Value'];
+            }
+
+            // ASCII header should be sent as-is
+            Assert::assertSame('foobar', $headers['X-Ascii-Header']);
+
+            // Non-ASCII header should be base64-encoded per RFC 2047
+            Assert::assertSame('=?UTF-8?B?'.base64_encode('éééééééé').'?=', $headers['X-NonAscii-Header']);
+
+            // Ensure the encoded value only contains printable ASCII characters (char codes 32-126)
+            Assert::assertMatchesRegularExpression('/^[\x20-\x7E]+$/', $headers['X-NonAscii-Header']);
+
+            return new MockResponse('{"MessageId": "foobar"}', ['http_code' => 200]);
+        });
+
+        $transport = new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false]), new NullProvider(), $client));
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $mail->getHeaders()->addTextHeader('X-Ascii-Header', 'foobar');
+        $mail->getHeaders()->addTextHeader('X-NonAscii-Header', 'éééééééé');
+
+        $transport->send($mail);
+    }
+
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
             $json = json_encode([
                 'message' => 'i\'m a teapot',
                 'type' => 'sender',
