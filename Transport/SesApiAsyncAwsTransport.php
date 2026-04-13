@@ -115,7 +115,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
     {
         $emailRecipients = array_merge($email->getCc(), $email->getBcc());
 
-        return array_filter($envelope->getRecipients(), fn (Address $address) => !\in_array($address, $emailRecipients, true));
+        return array_filter($envelope->getRecipients(), static fn (Address $address) => !\in_array($address, $emailRecipients, true));
     }
 
     protected function stringifyAddresses(array $addresses): array
