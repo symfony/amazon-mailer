@@ -26,7 +26,10 @@ use Symfony\Component\Mime\RawMessage;
 class SesSmtpTransport extends EsmtpTransport
 {
     /**
-     * @param string|null $region Amazon SES region
+     * @param string|null $region Amazon SES region (default `eu-west-1`)
+     * @param string      $host   SMTP host; `'default'` resolves to `email-smtp.<region>.amazonaws.com`
+     * @param int         $port   SMTP port; `465`/`2465` use implicit TLS, any other port starts plain and
+     *                            requires STARTTLS (via `setRequireTls(true)`) unless overridden by the caller
      */
     public function __construct(string $username, #[\SensitiveParameter] string $password, ?string $region = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null, string $host = 'default', int $port = 465)
     {
@@ -34,7 +37,13 @@ class SesSmtpTransport extends EsmtpTransport
             $host = \sprintf('email-smtp.%s.amazonaws.com', $region ?: 'eu-west-1');
         }
 
-        parent::__construct($host, $port, \in_array($port, [465, 2465], true), $dispatcher, $logger);
+        $tls = \in_array($port, [465, 2465], true);
+
+        parent::__construct($host, $port, $tls, $dispatcher, $logger);
+
+        if (!$tls) {
+            $this->setRequireTls(true);
+        }
 
         $this->setUsername($username);
         $this->setPassword($password);

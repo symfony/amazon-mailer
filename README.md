@@ -23,6 +23,17 @@ where:
  - `SESSION_TOKEN` is your Amazon SES session token (optional)
  - `PORT` is the port you want to communicate to SES with (optional, default `465`)
 
+For the `ses+smtp` / `ses+smtps` schemes, the `PORT` value selects the TLS mode:
+
+ - `465` and `2465` use implicit TLS (TLS wrapper mode);
+ - any other port (typically `587` or `2587`) starts in clear text and upgrades via STARTTLS. The
+   transport enforces `setRequireTls(true)` on those ports by default, so the SMTP session aborts if
+   the server does not advertise `STARTTLS`.
+
+Set `require_tls=0` on the DSN to opt out of the STARTTLS requirement (not recommended; only useful
+when an operator-controlled middlebox strips the `STARTTLS` extension and the network path is
+trusted). Set `require_tls=1` to enforce STARTTLS even on the implicit-TLS ports.
+
 Resources
 ---------
 
