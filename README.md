@@ -34,6 +34,13 @@ Set `require_tls=0` on the DSN to opt out of the STARTTLS requirement (not recom
 when an operator-controlled middlebox strips the `STARTTLS` extension and the network path is
 trusted). Set `require_tls=1` to enforce STARTTLS even on the implicit-TLS ports.
 
+Sponsor
+-------
+
+This package is looking for a [backer][1].
+
+Help Symfony by [sponsoring][3] its development!
+
 Resources
 ---------
 
@@ -41,3 +48,6 @@ Resources
  * [Report issues](https://github.com/symfony/symfony/issues) and
    [send Pull Requests](https://github.com/symfony/symfony/pulls)
    in the [main Symfony repository](https://github.com/symfony/symfony)
+
+[1]: https://symfony.com/backers
+[3]: https://symfony.com/sponsor
